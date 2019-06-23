@@ -10,7 +10,7 @@ const p2pPort: number = parseInt(process.env.P2P_PORT) || 6001;
 const initHttpServer = (myHttpPort: number) => {
     const app = express();
     app.use(bodyParser.json());
-
+    // 추가됨
     app.use((err, req, res, next) => {
         if (err) {
             res.status(400).send(err.message)
@@ -20,11 +20,14 @@ const initHttpServer = (myHttpPort: number) => {
     app.get('/blocks', (req, res) => {
         res.send(getBlockchain());
     });
+    
     app.post('/mineBlock', (req, res) => {
+        //추가됨
         if (req.body.data == null) {
             res.send('data parameter is missing');
             return;
         }
+        // const newBlock 수정됨
         const newBlock: Block = generateNextBlock(req.body.data);
         if (newBlock === null) {
             res.status(400).send('could not generate block');
