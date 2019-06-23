@@ -1,6 +1,6 @@
 import * as CryptoJS from 'crypto-js';
 import {broadcastLatest} from './p2p';
-import {UnspentTxOut, Transaction, processTransactions} from './transaction'
+import {UnspentTxOut, Transaction, processTransactions} from './transaction' //추가됨
 import {hexToBinary} from './util';
 
 class Block {
@@ -9,10 +9,10 @@ class Block {
     public hash: string;
     public previousHash: string;
     public timestamp: number;
-    public data: Transaction[];
+    public data: Transaction[]; //string 에서 Transaction[] 으로 변경됨
     public difficulty: number;
     public nonce: number;
-
+// 그에 맞추어서 constructor 도 변경시킴
     constructor(index: number, hash: string, previousHash: string,
                 timestamp: number, data: Transaction[], difficulty: number, nonce: number) {
         this.index = index;
@@ -30,7 +30,7 @@ const genesisBlock: Block = new Block(
 );
 
 let blockchain: Block[] = [genesisBlock];
-
+// 추가됨
 let unspentTxOuts: UnspentTxOut[] = [];
 
 const getBlockchain = (): Block[] => blockchain;
@@ -70,8 +70,10 @@ const getCurrentTimestamp = (): number => Math.round(new Date().getTime() / 1000
 const generateNextBlock = (blockData: Transaction[]) => {
     const previousBlock: Block = getLatestBlock();
     const difficulty: number = getDifficulty(getBlockchain());
+    //difficulty 없어짐
     const nextIndex: number = previousBlock.index + 1;
     const nextTimestamp: number = getCurrentTimestamp();
+    // const newBlock 변화
     const newBlock: Block = findBlock(nextIndex, previousBlock.hash, nextTimestamp, blockData, difficulty);
     if(addBlockToChain(newBlock)) {
         broadcastLatest();
@@ -100,17 +102,20 @@ const calculateHash = (index: number, previousHash: string, timestamp: number, d
                        difficulty: number, nonce: number): string =>
     CryptoJS.SHA256(index + previousHash + timestamp + data + difficulty + nonce).toString();
 
+// addBlock 이동됨
+
 const isValidBlockStructure = (block: Block): boolean => {
     return typeof block.index === 'number'
         && typeof block.hash === 'string'
         && typeof block.previousHash === 'string'
         && typeof block.timestamp === 'number'
-        && typeof block.data === 'object';
+        && typeof block.data === 'object'; //object 변경
 };
 
 const isValidNewBlock = (newBlock: Block, previousBlock: Block): boolean => {
     if (!isValidBlockStructure(newBlock)) {
         console.log('invalid block structure');
+        // 추가됨
         console.log(newBlock)
         return false;
     }
@@ -184,6 +189,7 @@ const isValidChain = (blockchainToValidate: Block[]): boolean => {
 
 const addBlockToChain = (newBlock: Block): boolean => {
     if (isValidNewBlock(newBlock, getLatestBlock())) {
+        // 추가 및 변화
         const retVal: UnspentTxOut[] = processTransactions(newBlock.data, unspentTxOuts, newBlock.index);
         if (retVal === null) {
             return false;
