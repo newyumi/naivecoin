@@ -5,11 +5,11 @@ import {broadcastLatest} from './p2p';
 class Block {
 
     // 블록 구조의 필수적인 요소들에 대한 구현이다. 
-    public index: number;
-    public hash: string;
-    public previousHash: string;
+    public index: number; // 블록의 높이
+    public hash: string; // SHA 256한 해시값, 특정 블록의 해시값이 변형되면 이후 모든 블록의 해시값도 수정되어야함 
+    public previousHash: string; // 이전 블록 해시에 대한 참조
     public timestamp: number;
-    public data: string;
+    public data: string; // 블록에 포함되어 있는 데이터
 
     constructor(index: number, hash: string, previousHash: string, timestamp: number, data: string) {
         this.index = index;
@@ -19,11 +19,13 @@ class Block {
         this.hash = hash;
     }
 }
-// genesisBlock 하드코딩 되어있다. 
+
+// genesisBlock 첫번째 블록, previousHash 값을 갖지 않는 유일한 블록, 하드코딩
 const genesisBlock: Block = new Block(
     // 위의 블록구조 처럼 index, hash, previousHash, timestamp, data 순으로 정보가 기입되어있음을 알 수 있다. 
     0, '816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7', '', 1465154705, 'my genesis block!!'
 );
+
 // 제네시스 블록을 가장 먼저 받아온다. 블록체인 저장을 시작하는 과정이다. 
 let blockchain: Block[] = [genesisBlock];
 

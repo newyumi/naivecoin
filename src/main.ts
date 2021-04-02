@@ -4,8 +4,8 @@ import * as express from 'express';
 import {Block, generateNextBlock, getBlockchain} from './blockchain';
 import {connectToPeers, getSockets, initP2PServer} from './p2p';
 
-const httpPort: number = parseInt(process.env.HTTP_PORT) || 3001;
-const p2pPort: number = parseInt(process.env.P2P_PORT) || 6001;
+const httpPort: number = parseInt(process.env.HTTP_PORT) || 3001; // 노드를 제어하기 위한 서버
+const p2pPort: number = parseInt(process.env.P2P_PORT) || 6001; // 노드간의 p2p 통신을 위해, 웹소켓 http 서버
 
 const initHttpServer = ( myHttpPort: number ) => {
     const app = express();
