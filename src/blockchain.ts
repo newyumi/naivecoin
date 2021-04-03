@@ -3,34 +3,35 @@ import {broadcastLatest} from './p2p';
 // 새롭게 import 되었다. 
 import {hexToBinary} from './util';
 // Block 의 class 를 설정한다. 
+
+// 난이도와 채굴 구현 
+// https://medium.com/caulink/javascript%EB%A1%9C-%EB%B8%94%EB%A1%9D%EC%B2%B4%EC%9D%B8-%EB%A7%8C%EB%93%A4%EA%B8%B0-2-5081895c4479 설명
+
 class Block {
 
-    // 블록 구조의 필수적인 요소들에 대한 구현이다. 
     public index: number;
     public hash: string;
     public previousHash: string;
     public timestamp: number;
     public data: string;
-    // 새롭게 추가되었다. 새롭게 block 의 요소로 추가되었다. 
     public difficulty: number;
     public nonce: number;
-    constructor(index: number, hash: string, previousHash: string,
-                timestamp: number, data: string, difficulty: number, nonce: number) {
+    constructor(index: number, hash: string, previousHash: string, timestamp: number, data: string, difficulty: number, nonce: number) {
         this.index = index;
         this.previousHash = previousHash;
         this.timestamp = timestamp;
         this.data = data;
         this.hash = hash;
-        // 똑같이 constructor 에도 추가된다. 
         this.difficulty = difficulty;
         this.nonce = nonce;
     }
 }
-// genesisBlock 하드코딩 되어있다.
+
 const genesisBlock: Block = new Block(
     // 위의 블록구조 처럼 index, hash, previousHash, timestamp, data, difficulty, nonce 순으로 정보가 기입되어있음을 알 수 있다. 
     0, '91a73664bc84c0baa1fc75ea6e4aa6d1d20c5df664c724e3159aefc2e1186627', '', 1465154705, 'my genesis block!!', 0, 0
 );
+
 // 제네시스 블록을 가장 먼저 받아온다. 블록체인 저장을 시작하는 과정이다. 
 let blockchain: Block[] = [genesisBlock];
 
@@ -43,7 +44,7 @@ const BLOCK_GENERATION_INTERVAL: number = 10;
 
 // 난이도 조정 주기를 설정해준다. in blocks
 const DIFFICULTY_ADJUSTMENT_INTERVAL: number = 10;
-// 새롭게 추가되었다. 
+
 const getDifficulty = (aBlockchain: Block[]): number => {
     const latestBlock: Block = aBlockchain[blockchain.length - 1];
     if (latestBlock.index % DIFFICULTY_ADJUSTMENT_INTERVAL === 0 && latestBlock.index !== 0) {
@@ -52,7 +53,6 @@ const getDifficulty = (aBlockchain: Block[]): number => {
         return latestBlock.difficulty;
     }
 };
-// 새롭게 추가되었다. 
 const getAdjustedDifficulty = (latestBlock: Block, aBlockchain: Block[]) => {
     const prevAdjustmentBlock: Block = aBlockchain[blockchain.length - DIFFICULTY_ADJUSTMENT_INTERVAL];
     const timeExpected: number = BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSTMENT_INTERVAL;
@@ -133,19 +133,19 @@ const isValidNewBlock = (newBlock: Block, previousBlock: Block): boolean => {
     }
     return true;
 };
-// 새롭게 추가되었다. 
+
 const getAccumulatedDifficulty = (aBlockchain: Block[]): number => {
     return aBlockchain
         .map((block) => block.difficulty)
         .map((difficulty) => Math.pow(2, difficulty))
         .reduce((a, b) => a + b);
 };
-// 새롭게 추가되었다. 
+
 const isValidTimestamp = (newBlock: Block, previousBlock: Block): boolean => {
     return ( previousBlock.timestamp - 60 < newBlock.timestamp )
         && newBlock.timestamp - 60 < getCurrentTimestamp();
 };
-// 새롭게 추가되었다. 
+
 const hasValidHash = (block: Block): boolean => {
 
     if (!hashMatchesBlockContent(block)) {
@@ -158,17 +158,18 @@ const hasValidHash = (block: Block): boolean => {
     }
     return true;
 };
-// 새롭게 추가되었다. 
+
 const hashMatchesBlockContent = (block: Block): boolean => {
     const blockHash: string = calculateHashForBlock(block);
     return blockHash === block.hash;
 };
-// 새롭게 추가되었다. 
+
 const hashMatchesDifficulty = (hash: string, difficulty: number): boolean => {
     const hashInBinary: string = hexToBinary(hash);
     const requiredPrefix: string = '0'.repeat(difficulty);
     return hashInBinary.startsWith(requiredPrefix);
 };
+
 // 체인의 유효성을 판단하는 과정이다.
 const isValidChain = (blockchainToValidate: Block[]): boolean => {
     // 체인의 첫 번째 블록이 genesisBlock 과 일치하는지 확인한다. 
@@ -194,6 +195,7 @@ const addBlockToChain = (newBlock: Block) => {
     }
     return false;
 };
+
 // 가장 긴 체인이 유효한 체인으로 교체되는 과정이다.
 const replaceChain = (newBlocks: Block[]) => {
     // 새로운 chain 이 유효한 chain 이고 그 chain 이 기존의 것보다 더 길면 교체된다.
