@@ -3,6 +3,8 @@ import {broadcastLatest} from './p2p';
 import {UnspentTxOut, Transaction, processTransactions} from './transaction' //추가됨
 import {hexToBinary} from './util';
 
+// 거래구현 시작
+// https://medium.com/caulink/javascript%EB%A1%9C-%EB%B8%94%EB%A1%9D%EC%B2%B4%EC%9D%B8-%EB%A7%8C%EB%93%A4%EA%B8%B0-3-136b614ce2a2
 class Block {
 
     public index: number;

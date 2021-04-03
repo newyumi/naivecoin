@@ -6,6 +6,10 @@ const ec = new ecdsa.ec('secp256k1');
 
 const COINBASE_AMOUNT: number = 50;
 
+// 개인키로 공개키는 만들 수 있지만, 공개키로 개인키 만들거나 역추적 불가, 공개되어도 문제 없다
+// 모든 메시지는 개인키를 사용하여 signature로 생성 
+// 해시 함수는 POW 채굴에 쓰이고, 공개키 암호화 (ECDSA)는 거래에 쓰임 
+
 class UnspentTxOut {
     public readonly txOutId: string;
     public readonly txOutIndex: number;
@@ -20,7 +24,7 @@ class UnspentTxOut {
     }
 }
 
-class TxIn {
+class TxIn { // only 개인키에 의해 생성된 서명만 포함하고 있다
     public txOutId: string;
     public txOutIndex: number;
     public signature: string;
@@ -40,8 +44,8 @@ class Transaction {
 
     public id: string;
 
-    public txIns: TxIn[];
-    public txOuts: TxOut[];
+    public txIns: TxIn[]; // 코인을 unlock
+    public txOuts: TxOut[]; // 코인을 다시 lock 
 }
 
 const getTransactionId = (transaction: Transaction): string => {
